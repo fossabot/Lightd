@@ -6,6 +6,10 @@
     "port": 8070,
     "worker_threads": 24
   },
+  "authorization": {
+    "enabled": true,
+    "token": "your-secure-api-token-here"
+  },
   "docker": {
     "socket_path": "/var/run/docker.sock"
   },

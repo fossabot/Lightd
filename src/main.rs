@@ -1,5 +1,6 @@
 use axum::{
     extract::State,
+    middleware,
     response::Json,
     routing::{delete, get, post, put},
     Router,
@@ -17,6 +18,7 @@ use bollard::{
     Docker,
 };
 
+mod auth;
 mod config;
 mod docker;
 mod handlers;
@@ -30,6 +32,7 @@ mod websocket;
 mod remote;
 mod services;
 
+use auth::{auth_middleware, AuthState};
 use container_tracker::ContainerTrackingManager;
 use state_manager::StateManager;
 use config::Config;
@@ -618,7 +621,17 @@ NightLight Daemon v{} (Liberal)
         .route("/volumes", get(handlers::volume::list_volumes))
         .route("/volumes/:name", delete(handlers::volume::remove_volume))
         .layer(CorsLayer::permissive())
+        .layer(middleware::from_fn_with_state(
+            AuthState::new(config.authorization.clone()),
+            auth_middleware,
+        ))
         .with_state(state);
+
+    if config.authorization.enabled {
+        info!("Authorization is ENABLED - all routes require valid Bearer token");
+    } else {
+        info!("Authorization is DISABLED - all routes are publicly accessible");
+    }
 
     let addr = format!("{}:{}", config.server.host, config.server.port);
     info!("Starting lightd server on {}", addr);

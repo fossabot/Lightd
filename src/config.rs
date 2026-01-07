@@ -8,11 +8,34 @@ pub struct Config {
     #[serde(default = "default_version")]
     pub version: String,
     pub server: ServerConfig,
+    #[serde(default)]
+    pub authorization: AuthorizationConfig,
     pub docker: DockerConfig,
     pub storage: StorageConfig,
     pub monitoring: Option<MonitoringConfig>,
     #[serde(skip)]
     pub network: Option<NetworkConfig>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthorizationConfig {
+    #[serde(default)]
+    pub enabled: bool,
+    #[serde(default = "default_token")]
+    pub token: String,
+}
+
+fn default_token() -> String {
+    "change-me-token".to_string()
+}
+
+impl Default for AuthorizationConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            token: default_token(),
+        }
+    }
 }
 
 fn default_version() -> String {
