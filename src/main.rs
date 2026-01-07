@@ -323,7 +323,28 @@ async fn network_exists(docker: &Docker, name: &str) -> anyhow::Result<bool> {
 
 async fn start_daemon() -> anyhow::Result<()> {
     let config = Config::load("config.json").await?;
+  
+    let version = "1.0.0"; // later get from config.json
+    let ascii_art = format!(
+r#"      
+    __    _       __    __      __
+   / /   (_)___ _/ /_  / /_____/ /
+  / /   / / __ `/ __ \/ __/ __  / 
+ / /___/ / /_/ / / / / /_/ /_/ /  
+/_____/_/\__, /_/ /_/\__/\__,_/   
+        /____/                           
+                                                          
+NightLight Daemon v{} (Liberal)
+(c) 2025 Nadhi.dev
+"#,
+        version
+    );
+
     
+
+
+  
+    info!("{}", ascii_art);
     info!("Tokio runtime configured with {} worker threads", config.server.worker_threads);
     
     let docker = DockerClient::new(&config.docker.socket_path).await?;
